@@ -1,0 +1,38 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "cppbuild",
+			"label": "C/C++: cl.exe build active file",
+			"command": "cl.exe",
+			"args": [
+				"/std:c++17",
+				"/Zi",
+				"/EHsc",
+				"/nologo",
+				"/Fe:",
+				"${fileDirname}\\${fileBasenameNoExtension}.exe",
+				"${file}",
+				"${fileDirname}\\MusicFile.cpp",
+				"${fileDirname}\\MusicLib.cpp",
+				"${fileDirname}\\SaveToLog.cpp",
+				"${fileDirname}\\frame.c",
+				"${fileDirname}\\header.c",
+				"${fileDirname}\\id3v2lib.c",
+				"${fileDirname}\\types.c",
+				"${fileDirname}\\utils.c"
+			],
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"problemMatcher": [
+				"$msCompile"
+			],
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"detail": "compiler: cl.exe"
+		}
+	]
+}
