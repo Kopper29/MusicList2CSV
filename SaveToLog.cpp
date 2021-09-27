@@ -3,7 +3,7 @@
 int ResetLog()
 {
     fstream fs;
-    fs.open(FileName, fstream::trunc);
+    fs.open(FileName, std::fstream::out|fstream::trunc);
     if (fs.is_open())
     {
         fs << "LOG BEGIN\n";

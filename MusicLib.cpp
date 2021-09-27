@@ -213,9 +213,14 @@ void MusicLib::PrintListsToM3Us(string M3UBasePath)
         //PrintContent(this->MusicMatchFiles);
         
         //Print this list
-        size_t ListNameBegin = PathName.find_last_of("\\")+1;
-        PrintListToM3U(PathName.substr(ListNameBegin, PathName.size()-ListNameBegin-4), M3UBasePath); //minus last 4 char ".m3u"
+            //Using only name
+        //size_t ListNameBegin = PathName.find_last_of("\\")+1;
+        //PrintListToM3U(PathName.substr(ListNameBegin, PathName.size()-ListNameBegin-4), M3UBasePath); //minus last 4 char ".m3u"
         
+            //Using full path (save to same folder as csv)
+        PrintListToM3U(PathName.substr(0, PathName.size()-4), M3UBasePath); //minus last 4 char ".m3u"
+        
+
         //Clear this list
         this->MusicMatchFiles.clear();
         PrintListContent(this->MusicMatchFiles);
@@ -274,9 +279,12 @@ void MusicLib::PrintListsToCSVs(){
         AddListFromTxtFile(PathName);
 
         //Print this list
-        size_t ListNameBegin = PathName.find_last_of("\\")+1;
-        PrintListToCSV(PathName.substr(ListNameBegin, PathName.size()-ListNameBegin-4)); //minus last 4 char ".txt"
-        
+            //ONLY NAME
+        //size_t ListNameBegin = PathName.find_last_of("\\")+1;
+        //PrintListToCSV(PathName.substr(ListNameBegin, PathName.size()-ListNameBegin-4)); //minus last 4 char ".txt"
+            //FULL PATH
+        PrintListToCSV(PathName.substr(0, PathName.size()-4)); //minus last 4 char ".txt"
+
         //Clear this list
         this->MusicListFiles.clear();
     }

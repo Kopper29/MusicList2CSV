@@ -11,20 +11,38 @@
 MusicList2CSV:
 
 Program 1:
-	Playlist Converter (single): CSV -> TXT
+	Playlist Converter (single): TXT -> CSV
 	MusicList2CSV.exe 1 C:\Users\Bruger\Dropbox\Musik\Pograms\BackupLister\hoilidayAway.txt
 
 Program 2:
-	Playlist Converter (multiple): CSV -> TXT
+	Playlist Converter (multiple): TXT -> CSV
 	MusicList2CSV.exe 2 C:\Users\Bruger\Dropbox\Musik\Pograms\BackupLister
 
 Program 3:
 	Library saver: LIB -> CSV
-	MusicList2CSV.exe 3 F:\MusicB
+	MusicList2CSV.exe 3 G:\MusicA
+	MusicList2CSV.exe 3 D:\Jakob\Music
+	*If program crashes while loading files, the file might have missing info like title, album or artist
+	*If program chrases with no dots, load has failed, this might be due to illigal characters: See LOG files
+	*If tag is NULL (for itunes songs):
+		1. Load the song into MP3Tag and save it, as it is.
+		2. Open properties of the song (Alt+Enter)
+		3. Edit a property and save it
+		4. Reopen the song, fix the edited property back and save again
+		5. The loading might still be wiered due to illigal characters like E_bar (E with bar over) or similar, fix this in the tag and save
 
 Program 4:
 	Playlist Converter (multiple): CSV -> M3U
-	MusicList2CSV.exe 4 F:\MusicB  C:\Users\Bruger\Dropbox\Musik\Pograms\BackupLister
+	MusicList2CSV.exe 4 F:\MusicB C:\Users\Bruger\Dropbox\Musik\Pograms\BackupLister 000-0000
+    *SD name can be found using the Filenamager+ app for android:
+    *Jakobs SD:  0000-0000
+	*Astrids SD: 52BC-2106
+
+Program 5:
+    Playlist Converter (multiple): txt -> CSV -> M3U. This combines Program 2 and Program 4.
+    MusicList2CSV.exe 5 F:\MusicB C:\Users\Bruger\Dropbox\Musik\Pograms\BackupLister 000-0000
+    *Jakobs SD:  0000-0000
+	*Astrids SD: 52BC-2106
 */
 
 
@@ -72,6 +90,7 @@ int main04(char *argv[])
 {
     string LibPath(argv[2]);
     string ListPath(argv[3]);
+    string SDName(argv[4]);
 
     MusicLib MyLib;
 
@@ -82,12 +101,39 @@ int main04(char *argv[])
     MyLib.AddListsFromDir(ListPath, "csv");
 
     //Save to M3U list file
-    MyLib.PrintListsToM3Us("/storage/0000-0000/Music"); //Use .. of base is relative on main lib
+    MyLib.PrintListsToM3Us("/storage/"+SDName+"/Music"); //Use .. of base is relative on main lib
     
     MyLib.PrintErrors();
     return 0;
 }
 
+// MAIN FOR: MAKE M3U from CSV from txt (txt->m3u)
+int main05(char *argv[])
+{
+    string LibPath(argv[2]);
+    string ListPath(argv[3]);
+    string SDName(argv[4]);
+
+    MusicLib MyLib;
+
+    //Adding txt files
+    MyLib.AddListsFromDir(ListPath, "txt");
+
+    //Print txt to csv
+    MyLib.PrintListsToCSVs();
+
+    //Adding music lib
+    MyLib.LoadLibFiles(LibPath);
+
+    //Adding music lists
+    MyLib.AddListsFromDir(ListPath, "csv");
+
+    //Save to M3U list file
+    MyLib.PrintListsToM3Us("/storage/"+SDName+"/Music"); //Use .. of base is relative on main lib
+    
+    MyLib.PrintErrors();
+    return 0;
+}
 
 
 //*************************************
@@ -103,18 +149,35 @@ int main(int argc, char *argv[])
 
     if(program.compare("help") == 0){
         cout << endl << "MusicList2CSV:" << endl;
+        cout << "General Format Description:" << endl;
+        cout << "MusicList2CSV.exe <Program No.> <Path 1> ... <Path n>" << endl << endl;
+        
         cout << "Program 1:" << endl;
         cout << "\tPlaylist Converter (single): TXT -> CSV" << endl;
-        cout << "\tMusicList2CSV.exe 1 C:\\Users\\Bruger\\Dropbox\\Musik\\Pograms\\BackupLister\\hoilidayAway.txt" << endl;
+        cout << "\t<Program No.> = 1, <Path 1> = fulle path of .txt playlist. Example:" << endl;
+        cout << "\tMusicList2CSV.exe 1 C:\\Users\\Bruger\\Dropbox\\Musik\\Pograms\\BackupLister\\hoilidayAway.txt" << endl << endl;
+
         cout << "Program 2:" << endl;
         cout << "\tPlaylist Converter (multiple): TXT -> CSV" << endl;
-        cout << "\tMusicList2CSV.exe 2 C:\\Users\\Bruger\\Dropbox\\Musik\\Pograms\\BackupLister" << endl;
+        cout << "\t<Program No.> = 2, <Path 1> = Directory path of .txt playlists (multiple). Example:" << endl;
+        cout << "\tMusicList2CSV.exe 2 C:\\Users\\Bruger\\Dropbox\\Musik\\Pograms\\BackupLister" << endl << endl;
+        
         cout << "Program 3:" << endl;
         cout << "\tLibrary saver: LIB -> CSV" << endl;
-        cout << "\tMusicList2CSV.exe 3 F:\\MusicB" << endl;
+        cout << "\t<Program No.> = 3, <Path 1> = Base Directory path of music libaray. Example:" << endl;
+        cout << "\tMusicList2CSV.exe 3 F:\\MusicB" << endl << endl;
+        
         cout << "Program 4:" << endl;
         cout << "\tPlaylist Converter (multiple): CSV -> M3U" << endl;
-        cout << "\tMusicList2CSV.exe 4 F:\\MusicB  C:\\Users\\Bruger\\Dropbox\\Musik\\Pograms\\BackupLister" << endl;
+        cout << "\t<Program No.> = 4, <Path 1> = Base Directory path of music libaray, <Path 2> = Directory path of .csv playlists (multiple), <Path 3> = Name of the SD card. Example:" << endl;
+        cout << "\tMusicList2CSV.exe 4 F:\\MusicB C:\\Users\\Bruger\\Dropbox\\Musik\\Pograms\\BackupLister 0000-0000" << endl << endl;
+        
+        cout << "Program 5:" << endl;
+        cout << "\tPlaylist Converter (multiple): txt -> CSV -> M3U" << endl;
+        cout << "\t<Program No.> = 5, <Path 1> = Base Directory path of music libaray, <Path 2> = Directory path of .txt playlists (multiple) that will be converted into .csv, <Path 3> = Name of the SD card. Example:" << endl;
+        cout << "\tMusicList2CSV.exe 5 F:\\MusicB C:\\Users\\Bruger\\Dropbox\\Musik\\Pograms\\BackupLister 0000-0000" << endl << endl;
+        
+        
         cout << "" << endl;
         cout << "" << endl;
         cout << "" << endl;
@@ -126,6 +189,8 @@ int main(int argc, char *argv[])
         rtnval = main03(argv);     
     }else if(program.compare("4") == 0){
         rtnval = main04(argv);  
+    }else if(program.compare("5") == 0){
+        rtnval = main05(argv);  
     }else{
         string errmsg = "ERROR! INVALID PROGRAM SELECTION! try help\r\n";
         cout << errmsg;
