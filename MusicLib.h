@@ -27,12 +27,14 @@ class MusicLib {
     void PrintListToCSV(string CSVFileName); //Printing the List to a CSV file
     void PrintListsToCSVs(); //Printing the List to a CSV file
     void PrintLibToCSV(string CSVFileName); //Printing the Lib to a CSV file
-    void PrintListsToM3Us(string M3UBasePath); //Prints the List to a M3U file, based on the Lib paths
+    void PrintListsToM3Us(string M3UBasePath, string type); //Prints the List to a M3U file, based on the Lib paths
     void PrintListToM3U(string M3UFileName, string M3UBasePath); //Prints the List to a M3U file, based on the Lib paths
     void PrintPaths(vector<filesystem::path> v); //Prints paths of file
     void PrintContent(MusicFile mfile);
     void PrintListContent(vector<MusicFile> v);
     void PrintErrors();
+    MusicFile GetMP3Tag(filesystem::path mp3FilePaths); //returns the tags (MusicFile) from the file of the file path (must be mp3!)
+    MusicFile GetMP3Tag2(filesystem::path mp3FilePaths); //returns the tags (MusicFile) from the file of the file path (must be mp3!)
 
     private:
     //Errors
@@ -42,6 +44,7 @@ class MusicLib {
     //Data structures
     string csvdelimiter; //csv delimiter
     vector<MusicFile> MusicListFiles; //Vector of music in a list
+    vector<MusicFile> MusicListFiles2; //Vector of music in a list with different split of " - "
     vector<MusicFile> MusicLibFiles; //vector of music in a lib
     vector<MusicFile> MusicMatchFiles; //Vector of music in a list
     string MusicLibDirPath; //path to lib
@@ -51,8 +54,8 @@ class MusicLib {
     vector<filesystem::path> MusicListFilePaths; //vector of path to list files in lib
     vector<filesystem::path> KeepOnlyX(vector<filesystem::path> p, string X); //Removes all file paths not leading to .X files (not case sensitive)
     
-    MusicFile GetMP3Tag(filesystem::path mp3FilePaths); //returns the tags (MusicFile) from the file of the file path (must be mp3!)
-    MusicFile GetMP3Tag2(filesystem::path mp3FilePaths); //returns the tags (MusicFile) from the file of the file path (must be mp3!)
+    //MusicFile GetMP3Tag(filesystem::path mp3FilePaths); //returns the tags (MusicFile) from the file of the file path (must be mp3!)
+    //MusicFile GetMP3Tag2(filesystem::path mp3FilePaths); //returns the tags (MusicFile) from the file of the file path (must be mp3!)
     vector<MusicFile> LoadMusicFiles(vector<filesystem::path> mp3FilePaths); //returns a vector of music files from a vector of mp3 paths 
     vector<MusicFile> LoadMusicFiles2(vector<filesystem::path> mp3FilePaths);
     string charArray2String(char* a, int index_start, int size); //char array to string converter
@@ -61,7 +64,7 @@ class MusicLib {
     string MusicLib::trim2(const string& line);
     string BackSlashSlashToSlash(string s);
     string MusicLib::convertToString(char* a, int size);
-    void FindListLibMatches(string PathName);
+    void FindListLibMatches(string PathName, string type);
     
 };
 

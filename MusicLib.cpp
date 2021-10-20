@@ -52,16 +52,24 @@ void MusicLib::AddListFromTxtFile(string FilePath){
     int i = 0;
     while(getline(ListFile, line))
     {
+        MusicFile Mfile;
+        
+        //First split: First and last of " - "
         size_t EndOfArtist = line.find(" - ");
         size_t StartOfAlbum = EndOfArtist + 3;
-        size_t EndOfAlbum = line.find(" - ", StartOfAlbum);
+        size_t EndOfAlbum = line.rfind(" - ");
         size_t StartOfTitle = EndOfAlbum + 3;
-        
-        MusicFile Mfile;
         Mfile.set_artist(line.substr(0, EndOfArtist));
         Mfile.set_album(line.substr(StartOfAlbum, EndOfAlbum-StartOfAlbum));
         Mfile.set_title(line.substr(StartOfTitle, line.size() - StartOfTitle));
         this->MusicListFiles.push_back(Mfile);
+
+        //Second split: First and second of " - "
+        size_t EndOfAlbum2 = line.find(" - ",StartOfAlbum);
+        size_t StartOfTitle2 = EndOfAlbum2 + 3;
+        Mfile.set_album(line.substr(StartOfAlbum, EndOfAlbum2-StartOfAlbum));
+        Mfile.set_title(line.substr(StartOfTitle2, line.size() - StartOfTitle2));
+        this->MusicListFiles2.push_back(Mfile);
         //cout << "added " << Mfile.title<<endl;
         i++;
     }
@@ -171,17 +179,24 @@ void MusicLib::AddListFromCsvFile(string FilePath){
 
 
 
-void MusicLib::FindListLibMatches(string PathName)
+void MusicLib::FindListLibMatches(string PathName, string type)
 {
     //Add this list
-    AddListFromCsvFile(PathName);
+    if(type.compare("txt") == 0){
+        AddListFromTxtFile(PathName);
+    }
+    else if(type.compare("csv") == 0){  
+        AddListFromCsvFile(PathName);
+    }else{
+        AddError(("Error 10 (in FindListLibMatches): No Match For Type = \"txt\" or \"csv\". Type was: " + type));
+    }
 
     //For each music file in the list
     for(auto it_list = this->MusicListFiles.begin(); it_list != this->MusicListFiles.end(); it_list++)
     {
         bool matchFound = false; 
         MusicFile listfile = *it_list;
-        //For each music file in the lab
+        //For each music file in the lib
         for(auto it_lib = this->MusicLibFiles.begin(); it_lib != this->MusicLibFiles.end(); it_lib++)
         {
             MusicFile libfile = *it_lib;
@@ -194,22 +209,40 @@ void MusicLib::FindListLibMatches(string PathName)
                 matchFound = true;
             }
         }
-        if(!matchFound){
+        if( (!matchFound) && (type.compare("txt") == 0) ){ //Match not found, and from txt file, try alt split'
+            cout << "No match here, tryed other split" << endl; 
+            listfile = this->MusicListFiles2.at(it_list-this->MusicListFiles.begin()); //Alt Split
+
+            //For each music file in the lib
+            for(auto it_lib = this->MusicLibFiles.begin(); it_lib != this->MusicLibFiles.end(); it_lib++)
+            {
+                MusicFile libfile = *it_lib;
+                //Is list file a match?
+                //cout << endl << "Compare with: " << libfile.artist << "; " << libfile.title << endl;
+                if( (listfile.album.compare(libfile.album)==0) && (listfile.artist.compare(libfile.artist)==0) && (listfile.title.compare(libfile.title)==0))
+                {
+                    //Add libfile to match
+                    this->MusicMatchFiles.push_back(libfile);
+                    matchFound = true;
+                }
+            }
+        }
+        if(!matchFound){ //Match not found
             cout << endl << " !!! MATCH NOT FOUND FOR: " << listfile.artist << "; " << listfile.title << " !!! " << endl << endl;
-            AddError(("Error 03 (in FindListLibMatches): No Match For: " + listfile.artist + ", " + listfile.title ));
+            AddError(("Error 03 (in FindListLibMatches): No Match For: " + listfile.artist + ", " + listfile.album + ", " + listfile.title ));
         }
     }
     this->MusicListFiles.clear();
 }
 
-void MusicLib::PrintListsToM3Us(string M3UBasePath)
+void MusicLib::PrintListsToM3Us(string M3UBasePath, string type)
 {
     //For each list
     for(auto it_path = this->MusicListFilePaths.begin(); it_path != this->MusicListFilePaths.end(); it_path++)
     {
         //Find Listmatches:
         string PathName = (*it_path).string();
-        FindListLibMatches(PathName);
+        FindListLibMatches(PathName, type);
         //PrintContent(this->MusicMatchFiles);
         
         //Print this list
@@ -226,6 +259,8 @@ void MusicLib::PrintListsToM3Us(string M3UBasePath)
         PrintListContent(this->MusicMatchFiles);
     }
 }
+
+
 
 void MusicLib::AddListsFromDir(string DirPath, string type)
 {

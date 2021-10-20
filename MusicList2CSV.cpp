@@ -41,6 +41,15 @@ Program 4:
 Program 5:
     Playlist Converter (multiple): txt -> CSV -> M3U. This combines Program 2 and Program 4.
     MusicList2CSV.exe 5 F:\MusicB C:\Users\Bruger\Dropbox\Musik\Pograms\BackupLister 000-0000
+    MusicList2CSV.exe 5 D:\Jakob\Music  D:\Jakob\Dropbox\Musik\Pograms\BackupLister 0000-0000
+    *Jakobs SD:  0000-0000
+	*Astrids SD: 52BC-2106
+
+Program 6:
+    Same as 5, but no creation/use of csv files.
+    Playlist Converter (multiple): txt -> M3U.
+    MusicList2CSV.exe 6 F:\MusicB C:\Users\Bruger\Dropbox\Musik\Pograms\BackupLister 000-0000
+    MusicList2CSV.exe 6 D:\Jakob\Music  D:\Jakob\Dropbox\Musik\Pograms\BackupLister 0000-0000
     *Jakobs SD:  0000-0000
 	*Astrids SD: 52BC-2106
 */
@@ -101,7 +110,7 @@ int main04(char *argv[])
     MyLib.AddListsFromDir(ListPath, "csv");
 
     //Save to M3U list file
-    MyLib.PrintListsToM3Us("/storage/"+SDName+"/Music"); //Use .. of base is relative on main lib
+    MyLib.PrintListsToM3Us("/storage/"+SDName+"/Music", "csv"); //Use .. of base is relative on main lib
     
     MyLib.PrintErrors();
     return 0;
@@ -129,12 +138,52 @@ int main05(char *argv[])
     MyLib.AddListsFromDir(ListPath, "csv");
 
     //Save to M3U list file
-    MyLib.PrintListsToM3Us("/storage/"+SDName+"/Music"); //Use .. of base is relative on main lib
+    MyLib.PrintListsToM3Us("/storage/"+SDName+"/Music", "csv"); //Use .. of base is relative on main lib
     
     MyLib.PrintErrors();
     return 0;
 }
 
+// MAIN FOR: MAKE M3U from txt (direct conversion with extra check) (txt->m3u)
+int main06(char *argv[])
+{
+    string LibPath(argv[2]);
+    string ListPath(argv[3]);
+    string SDName(argv[4]);
+
+    MusicLib MyLib;
+
+    //Adding txt files
+    //MyLib.AddListsFromDir(ListPath, "txt");
+
+    //Print txt to csv
+    //MyLib.PrintListsToCSVs();
+
+    //Adding music lib
+    MyLib.LoadLibFiles(LibPath);
+
+    //Adding music lists
+    MyLib.AddListsFromDir(ListPath, "txt");
+
+    //Save to M3U list file
+    MyLib.PrintListsToM3Us("/storage/"+SDName+"/Music", "txt"); //Use .. of base is relative on main lib
+    
+    MyLib.PrintErrors();
+    return 0;
+}
+
+// MAIN FOR: Print props of music file
+int main07(char *argv[])
+{
+    string FilePath(argv[2]);
+    MusicLib MyLib;
+
+    MusicFile mfile = MyLib.GetMP3Tag2(FilePath);
+    MyLib.PrintContent(mfile);
+
+    MyLib.PrintErrors();
+    return 0;
+}
 
 //*************************************
 //          MAIN
@@ -191,6 +240,10 @@ int main(int argc, char *argv[])
         rtnval = main04(argv);  
     }else if(program.compare("5") == 0){
         rtnval = main05(argv);  
+    }else if(program.compare("6") == 0){
+        rtnval = main06(argv);  
+    }else if(program.compare("7") == 0){
+        rtnval = main07(argv);  
     }else{
         string errmsg = "ERROR! INVALID PROGRAM SELECTION! try help\r\n";
         cout << errmsg;
