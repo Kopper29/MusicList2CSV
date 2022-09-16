@@ -33,6 +33,7 @@ class MusicLib {
     void PrintContent(MusicFile mfile);
     void PrintListContent(vector<MusicFile> v);
     void PrintErrors();
+    void SaveListsAsMp3InFolder(string type); // 
     MusicFile GetMP3Tag(filesystem::path mp3FilePaths); //returns the tags (MusicFile) from the file of the file path (must be mp3!)
     MusicFile GetMP3Tag2(filesystem::path mp3FilePaths); //returns the tags (MusicFile) from the file of the file path (must be mp3!)
 
@@ -65,7 +66,8 @@ class MusicLib {
     string BackSlashSlashToSlash(string s);
     string MusicLib::convertToString(char* a, int size);
     void FindListLibMatches(string PathName, string type);
-    
+    void MusicLib::SaveListedMusicFilesInFolder(string folderName); //Saves the listed (playlisted) songs to a folder
+
 };
 
 #endif

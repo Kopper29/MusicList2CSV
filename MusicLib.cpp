@@ -246,11 +246,11 @@ void MusicLib::PrintListsToM3Us(string M3UBasePath, string type)
         //PrintContent(this->MusicMatchFiles);
         
         //Print this list
-            //Using only name
+        //Using only name
         //size_t ListNameBegin = PathName.find_last_of("\\")+1;
         //PrintListToM3U(PathName.substr(ListNameBegin, PathName.size()-ListNameBegin-4), M3UBasePath); //minus last 4 char ".m3u"
         
-            //Using full path (save to same folder as csv)
+        //Using full path (save to same folder as csv)
         PrintListToM3U(PathName.substr(0, PathName.size()-4), M3UBasePath); //minus last 4 char ".m3u"
         
 
@@ -260,17 +260,46 @@ void MusicLib::PrintListsToM3Us(string M3UBasePath, string type)
     }
 }
 
+void MusicLib::SaveListsAsMp3InFolder(string type)
+{
+    //For each list
+    for(auto it_path = this->MusicListFilePaths.begin(); it_path != this->MusicListFilePaths.end(); it_path++)
+    {
+        //Find Listmatches:
+        string PathName = (*it_path).string();
+        FindListLibMatches(PathName, type);
+        //PrintContent(this->MusicMatchFiles);
+        
+        //Using full path (save to a subfolder in same folder as csv)
+        //Find folder name
+        size_t fileNameBegin = PathName.find_last_of("\\")+1;
+        string folderName = PathName.substr(fileNameBegin, PathName.size()-fileNameBegin-4);
+        PathName = PathName.substr(0,fileNameBegin);
+
+        cout<<"Path Name: "+PathName<<endl;
+        cout<<"folderName: "+folderName<<endl;
+
+        
+        cout<<"Creating folder at: "+PathName+folderName+"\\"<<endl;
+        filesystem::create_directory(PathName+folderName+"\\");
+        SaveListedMusicFilesInFolder(PathName+folderName+"\\"); 
+   
+        //Clear this list
+        this->MusicMatchFiles.clear();
+        //PrintListContent(this->MusicMatchFiles);
+    }
+}
 
 
 void MusicLib::AddListsFromDir(string DirPath, string type)
 {
     this->MusicListFilePaths = AllDirFilePaths(DirPath);
-    cout << "The Following Paths Has Been Found: " << endl;
+    cout << "The Following Paths Have Been Found: " << endl;
     PrintPaths(this->MusicListFilePaths);
     cout << endl;
 
     this->MusicListFilePaths = KeepOnlyX(this->MusicListFilePaths, type);
-    cout << "The Following List Paths Has Been Found: " << endl;
+    cout << "The Following List Paths Have Been Found: " << endl;
     PrintPaths(this->MusicListFilePaths);
     cout << endl;
 }
@@ -367,6 +396,22 @@ void MusicLib::PrintListToM3U(string M3UFileName, string M3UBasePath){
         cout << "Failed to open the file: " << M3UFileName << endl;
         AddError(("Error 05 (in PrintListToM3U): Could not open: " + M3UFileName));     
     }
+}
+
+void MusicLib::SaveListedMusicFilesInFolder(string folderName){
+    cout << "copying listed files ..." << endl;
+    int i = 0;
+    for(auto it = this->MusicMatchFiles.begin(); it != this->MusicMatchFiles.end(); it++)
+    {
+        //Add tag
+        MusicFile Mfile = *it;
+
+        size_t fileNameBegin = Mfile.path.find_last_of("\\")+1;
+        string fileName = Mfile.path.substr(fileNameBegin, Mfile.path.size()-fileNameBegin);
+        filesystem::copy_file(Mfile.path, folderName+fileName);
+        i++;
+    }
+    cout << i << " songs added" << endl;
 }
 
 void MusicLib::PrintPaths(vector<filesystem::path> v){

@@ -185,6 +185,29 @@ int main07(char *argv[])
     return 0;
 }
 
+// MAIN FOR: SAVE PLAYLIST AS MP3 FILES IN A FOLDER (txt -> folder with mp3's)
+int main08(char *argv[])
+{
+    string LibPath(argv[2]);
+    string ListPath(argv[3]);
+
+    MusicLib MyLib;
+
+    //Adding music lib
+    MyLib.LoadLibFiles(LibPath);
+
+    //Adding music lists
+    MyLib.AddListsFromDir(ListPath, "txt");
+
+    //Save to M3U list file
+    MyLib.SaveListsAsMp3InFolder("txt");
+
+    //MyLib.PrintListsToM3Us("/storage/"+SDName+"/Music", "txt"); //Use .. of base is relative on main lib
+    
+    MyLib.PrintErrors();
+    return 0;
+}
+
 //*************************************
 //          MAIN
 //*************************************
@@ -200,6 +223,7 @@ int main(int argc, char *argv[])
         cout << endl << "MusicList2CSV:" << endl;
         cout << "General Format Description:" << endl;
         cout << "MusicList2CSV.exe <Program No.> <Path 1> ... <Path n>" << endl << endl;
+        cout << "If the fields are empty -> use mp3tag to save the music file, and use properies to edit, save, reedit and save." << endl << endl;
         
         cout << "Program 1:" << endl;
         cout << "\tPlaylist Converter (single): TXT -> CSV" << endl;
@@ -225,7 +249,22 @@ int main(int argc, char *argv[])
         cout << "\tPlaylist Converter (multiple): txt -> CSV -> M3U" << endl;
         cout << "\t<Program No.> = 5, <Path 1> = Base Directory path of music libaray, <Path 2> = Directory path of .txt playlists (multiple) that will be converted into .csv, <Path 3> = Name of the SD card. Example:" << endl;
         cout << "\tMusicList2CSV.exe 5 F:\\MusicB C:\\Users\\Bruger\\Dropbox\\Musik\\Pograms\\BackupLister 0000-0000" << endl << endl;
-        
+
+        cout << "Program 6:" << endl;
+        cout << "\tPlaylist Converter (multiple, Direct with extra checks): txt -> M3U" << endl;
+        cout << "\t<Program No.> = 6, <Path 1> = Base Directory path of music libaray, <Path 2> = Directory path of .txt playlists (multiple) that will be converted into .csv, <Path 3> = Name of the SD card. Example:" << endl;
+        cout << "\tMusicList2CSV.exe 6 F:\\MusicB C:\\Users\\Bruger\\Dropbox\\Musik\\Pograms\\BackupLister 0000-0000" << endl << endl;
+
+        cout << "Program 7:" << endl;
+        cout << "\tPrint Properties of single music file: txt -> CSV -> M3U" << endl;
+        cout << "\t<Program No.> = 7, <Path 1> = Path to music file. Example:" << endl;
+        cout << "\tMusicList2CSV.exe 7 D:\\Jakob\\Music\\Doja Cat\\Kiss Me More (feat. SZA) - Single\\01 Kiss Me More (feat. SZA).mp3" << endl << endl;
+
+        cout << "Program 8:" << endl;
+        cout << "\tSave Playlist files in a folder: txt -> mp3's in a folder" << endl;
+        cout << "\t<Program No.> = 8, <Path 1> = Base Directory path of music libaray, <Path 2> = Directory path of .txt playlists (multiple). Example:" << endl;
+        cout << "\tMusicList2CSV.exe 8 D:\\Jakob\\Music D:\\Jakob\\Documents\\PlaylistTestFolder" << endl << endl;
+
         
         cout << "" << endl;
         cout << "" << endl;
@@ -244,6 +283,8 @@ int main(int argc, char *argv[])
         rtnval = main06(argv);  
     }else if(program.compare("7") == 0){
         rtnval = main07(argv);  
+    }else if(program.compare("8") == 0){
+        rtnval = main08(argv);  
     }else{
         string errmsg = "ERROR! INVALID PROGRAM SELECTION! try help\r\n";
         cout << errmsg;

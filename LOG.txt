@@ -1,2 +1,1 @@
 LOG BEGIN
-Program Has Ended
