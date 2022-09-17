@@ -67,6 +67,7 @@ class MusicLib {
     string MusicLib::convertToString(char* a, int size);
     void FindListLibMatches(string PathName, string type);
     void MusicLib::SaveListedMusicFilesInFolder(string folderName); //Saves the listed (playlisted) songs to a folder
+    string stringToUpper(string s); // convert a string to uppcase.
 
 };
 

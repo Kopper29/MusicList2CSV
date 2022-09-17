@@ -178,6 +178,10 @@ void MusicLib::AddListFromCsvFile(string FilePath){
 }
 
 
+string MusicLib::stringToUpper(string s){
+    transform(s.begin(), s.end(),s.begin(), ::toupper);
+    return s;
+}
 
 void MusicLib::FindListLibMatches(string PathName, string type)
 {
@@ -202,14 +206,14 @@ void MusicLib::FindListLibMatches(string PathName, string type)
             MusicFile libfile = *it_lib;
             //Is list file a match?
             //cout << endl << "Compare with: " << libfile.artist << "; " << libfile.title << endl;
-            if( (listfile.album.compare(libfile.album)==0) && (listfile.artist.compare(libfile.artist)==0) && (listfile.title.compare(libfile.title)==0))
+            if( (stringToUpper(listfile.album).compare(stringToUpper(libfile.album))==0) && (stringToUpper(listfile.artist).compare(stringToUpper(libfile.artist))==0) && (stringToUpper(listfile.title).compare(stringToUpper(libfile.title))==0))
             {
                 //Add libfile to match
                 this->MusicMatchFiles.push_back(libfile);
                 matchFound = true;
             }
         }
-        if( (!matchFound) && (type.compare("txt") == 0) ){ //Match not found, and from txt file, try alt split'
+        if( (!matchFound) && (type.compare("txt") == 0) ){ //Match not found, and from txt file, try alternative split
             cout << "No match here, tryed other split" << endl; 
             listfile = this->MusicListFiles2.at(it_list-this->MusicListFiles.begin()); //Alt Split
 
@@ -219,7 +223,7 @@ void MusicLib::FindListLibMatches(string PathName, string type)
                 MusicFile libfile = *it_lib;
                 //Is list file a match?
                 //cout << endl << "Compare with: " << libfile.artist << "; " << libfile.title << endl;
-                if( (listfile.album.compare(libfile.album)==0) && (listfile.artist.compare(libfile.artist)==0) && (listfile.title.compare(libfile.title)==0))
+                if( (stringToUpper(listfile.album).compare(stringToUpper(libfile.album))==0) && (stringToUpper(listfile.artist).compare(stringToUpper(libfile.artist))==0) && (stringToUpper(listfile.title).compare(stringToUpper(libfile.title))==0))
                 {
                     //Add libfile to match
                     this->MusicMatchFiles.push_back(libfile);
@@ -228,7 +232,7 @@ void MusicLib::FindListLibMatches(string PathName, string type)
             }
         }
         if(!matchFound){ //Match not found
-            cout << endl << " !!! MATCH NOT FOUND FOR: " << listfile.artist << "; " << listfile.title << " !!! " << endl << endl;
+            cout << endl << " !!! MATCH NOT FOUND FOR: " + listfile.artist + ", " + listfile.album + ", " + listfile.title << " !!! " << endl << endl;
             AddError(("Error 03 (in FindListLibMatches): No Match For: " + listfile.artist + ", " + listfile.album + ", " + listfile.title ));
         }
     }
@@ -399,8 +403,9 @@ void MusicLib::PrintListToM3U(string M3UFileName, string M3UBasePath){
 }
 
 void MusicLib::SaveListedMusicFilesInFolder(string folderName){
-    cout << "copying listed files ..." << endl;
+    cout << "Copying listed files (total: " <<  this->MusicMatchFiles.size() << ")..." << endl;
     int i = 0;
+    int j = 0;
     for(auto it = this->MusicMatchFiles.begin(); it != this->MusicMatchFiles.end(); it++)
     {
         //Add tag
@@ -408,10 +413,17 @@ void MusicLib::SaveListedMusicFilesInFolder(string folderName){
 
         size_t fileNameBegin = Mfile.path.find_last_of("\\")+1;
         string fileName = Mfile.path.substr(fileNameBegin, Mfile.path.size()-fileNameBegin);
-        filesystem::copy_file(Mfile.path, folderName+fileName);
+        
+        //cout << "Copying: " + Mfile.path << endl;
+        if(!filesystem::copy_file(Mfile.path, folderName+fileName, filesystem::copy_options::overwrite_existing)){
+            cout << "Failed to copy file: " << Mfile.path << endl;
+            AddError(("Failed to copy file: " + Mfile.path));
+            j++;  
+        }
         i++;
     }
-    cout << i << " songs added" << endl;
+    cout << i << " songs copied/added" << endl;
+    cout << j << " songs not copied/failed" << endl;
 }
 
 void MusicLib::PrintPaths(vector<filesystem::path> v){
