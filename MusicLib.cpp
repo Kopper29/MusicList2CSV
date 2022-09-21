@@ -53,23 +53,31 @@ void MusicLib::AddListFromTxtFile(string FilePath){
     while(getline(ListFile, line))
     {
         MusicFile Mfile;
+        MusicFile Mfile2;
         
         //First split: First and last of " - "
-        size_t EndOfArtist = line.find(" - ");
+        size_t EndOfArtist = line.find(" - "); //find first
         size_t StartOfAlbum = EndOfArtist + 3;
-        size_t EndOfAlbum = line.rfind(" - ");
+        size_t EndOfAlbum = line.rfind(" - "); //find last
         size_t StartOfTitle = EndOfAlbum + 3;
         Mfile.set_artist(line.substr(0, EndOfArtist));
         Mfile.set_album(line.substr(StartOfAlbum, EndOfAlbum-StartOfAlbum));
         Mfile.set_title(line.substr(StartOfTitle, line.size() - StartOfTitle));
+        /*
+        if(Mfile.album.compare("?")){ //This char cannot be read by the MP3 reader.
+            Mfile.set_album("-"); 
+        }
+        */
         this->MusicListFiles.push_back(Mfile);
+        
 
         //Second split: First and second of " - "
-        size_t EndOfAlbum2 = line.find(" - ",StartOfAlbum);
+        size_t EndOfAlbum2 = line.find(" - ",StartOfAlbum); //find first after artist
         size_t StartOfTitle2 = EndOfAlbum2 + 3;
-        Mfile.set_album(line.substr(StartOfAlbum, EndOfAlbum2-StartOfAlbum));
-        Mfile.set_title(line.substr(StartOfTitle2, line.size() - StartOfTitle2));
-        this->MusicListFiles2.push_back(Mfile);
+        Mfile2.set_artist(line.substr(0, EndOfArtist));
+        Mfile2.set_album(line.substr(StartOfAlbum, EndOfAlbum2-StartOfAlbum));
+        Mfile2.set_title(line.substr(StartOfTitle2, line.size() - StartOfTitle2));
+        this->MusicListFiles2.push_back(Mfile2);
         //cout << "added " << Mfile.title<<endl;
         i++;
     }
@@ -214,8 +222,8 @@ void MusicLib::FindListLibMatches(string PathName, string type)
             }
         }
         if( (!matchFound) && (type.compare("txt") == 0) ){ //Match not found, and from txt file, try alternative split
-            cout << "No match here, tryed other split" << endl; 
-            listfile = this->MusicListFiles2.at(it_list-this->MusicListFiles.begin()); //Alt Split
+            cout << endl << "No match found for: "+listfile.artist+", "+listfile.album+", "+listfile.title+". Trying other split" << endl; 
+            listfile = this->MusicListFiles2.at(it_list - this->MusicListFiles.begin()); //Alt Split
 
             //For each music file in the lib
             for(auto it_lib = this->MusicLibFiles.begin(); it_lib != this->MusicLibFiles.end(); it_lib++)
@@ -228,15 +236,17 @@ void MusicLib::FindListLibMatches(string PathName, string type)
                     //Add libfile to match
                     this->MusicMatchFiles.push_back(libfile);
                     matchFound = true;
+                    cout << "Match found with other split: "+listfile.artist+", "+listfile.album+", "+listfile.title << endl;
                 }
             }
         }
         if(!matchFound){ //Match not found
-            cout << endl << " !!! MATCH NOT FOUND FOR: " + listfile.artist + ", " + listfile.album + ", " + listfile.title << " !!! " << endl << endl;
+            cout << " !!! MATCH NOT FOUND FOR: " + listfile.artist + ", " + listfile.album + ", " + listfile.title << " !!! " << endl << endl;
             AddError(("Error 03 (in FindListLibMatches): No Match For: " + listfile.artist + ", " + listfile.album + ", " + listfile.title ));
         }
     }
     this->MusicListFiles.clear();
+    this->MusicListFiles2.clear();
 }
 
 void MusicLib::PrintListsToM3Us(string M3UBasePath, string type)
@@ -423,7 +433,7 @@ void MusicLib::SaveListedMusicFilesInFolder(string folderName){
         i++;
     }
     cout << i << " songs copied/added" << endl;
-    cout << j << " songs not copied/failed" << endl;
+    cout << j << " songs not copied/failed" << endl << endl;
 }
 
 void MusicLib::PrintPaths(vector<filesystem::path> v){
